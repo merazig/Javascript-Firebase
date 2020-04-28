@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>My shop</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            color: white;
+            background-color: black;
+        }
+        .products {
+            padding-top: 150px;
+            padding-left: 200px;
+        }
+
+        #product {
+            width: 250px;
+            height: 25px;
+            color: white;
+            background-color: transparent;
+            border-radius: 5px;
+            border: 0;
+            border: blue solid 2px;
+            margin-right: 5px;
+            padding-left: 5px;
+        }
+
+        #quantity, #price {
+            width: 40px;
+            height: 25px;
+            color: white;
+            background-color: transparent;
+            border-radius: 5px;
+            border: 0;
+            border: blue solid 2px;
+            margin-right: 5px;
+            padding-left: 5px;
+        }
+
+        #price {
+            width: 50px;
+        }
+
+        button {
+            height: 25px;
+            border-radius: 5px;
+            background-color: greenyellow;
+            border: 0px;
+            color: black;
+            border:greenyellow solid 2px;
+        }
+
+        button:hover {
+            background-color: transparent;
+            color: greenyellow;
+        }
+
+        #theList {
+            padding-top: 50px;
+            padding-left: 200px;
+        }
+
+        .card {
+            padding-top: 10px;
+            margin-bottom: 10px;
+            padding-left: 5px;
+            border-radius:5px;
+            width: 350px;
+            height: 25px;
+        }
+    </style>
+</head>
+<body>
+    <div class="products">
+        <input type="text" name="product" id="product" placeholder="New product">
+        <input type="text" name="price" id="price" placeholder="19.90 $">
+        <input type="number" id="quantity" min="1" value="1">
+        <button onclick="addProduct()">add product</button>
+    </div>
+    <div id="theList">
+
+    </div>
+
+        <!-- Very important -->
+    <script src="https://www.gstatic.com/firebasejs/7.12.0/firebase.js"></script>
+    
+
+    <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+        apiKey: "AIzaSyCQAkBvPdoNM_IANzc3VG3XseuRXm-zLvk",
+        authDomain: "products-e1e20.firebaseapp.com",
+        databaseURL: "https://products-e1e20.firebaseio.com",
+        projectId: "products-e1e20",
+        storageBucket: "products-e1e20.appspot.com",
+        messagingSenderId: "911723941212",
+        appId: "1:911723941212:web:aa07285d65035c312b8599",
+        measurementId: "G-J72VDZV96L"
+    };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        // Database variable
+        firebase.database();
+        // add product to database
+        function addProduct(){
+            //push create auto id
+            firebase.database().ref('Shirts').push({
+                brand: document.getElementById("product").value,
+                quantity: document.getElementById("quantity").value,
+                price: document.getElementById("price").value
+            });
+            document.getElementById("product").value = ' ';
+            document.getElementById("quantity").value = 1;
+            getProducts();
+        }
+        // array for product Keys
+        ids = [];
+        // index 
+        i = 0;
+        // Get All products ordered by Key 
+        var query = firebase.database().ref("Shirts").orderByKey();
+        function getProducts(){
+            document.getElementById("theList").innerHTML = ' ';
+            query.once("value")
+            .then(function(snapshot) {
+                snapshot.forEach(function(childSnapshot) {
+                var key = childSnapshot.key;
+                ids.push(key);
+                var childData = childSnapshot.val();
+                document.getElementById("theList").innerHTML += '<p class="card" class="card" id='+"'l"+i+"'"
+                                                                +'>Brand: ' + childData.brand 
+                                                                +', Quantity: ' + childData.quantity 
+                                                                + ', Price: ' + childData.price
+                                                                + '<button style="position: relative; left:10px"'+
+                                                                'onclick="deletep('+"'"+i+"'"+')">X</button></p>';
+                i++;    
+            });
+            });
+        }
+
+        getProducts();
+
+        function deletep(x) {
+            n = Number(x);
+            cid = 'l'+x;
+            key = 'Shirts/'+ids[x]
+            var adaRef = firebase.database().ref(key);
+            adaRef.remove();
+            document.getElementById(cid).remove();
+        }
+    </script>
+</body>
+</html>
